@@ -21,11 +21,14 @@ public class MainActivity extends AppCompatActivity {
             Log.d("testseb", "Could not load zenroom native library: " + exc.getMessage());
         }
     }
+
+
+    // In the function below, Zenroom is executed in verbose mode (conf="debug=3"), so the whole execution and the output
+    // will be printed to console.
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Log.d("testseb", "Starting the test....");
 
         script = "rule check version 1.0.0\n"
         + "Scenario 'ecdh':Create the keypair\n"
@@ -34,23 +37,19 @@ public class MainActivity extends AppCompatActivity {
         + "Then print all data";
         keys = "";
         data= "";
-        conf = "debug=0";
+        conf = "debug=3";
 
-        String result = (new Zenroom()).execute(script, conf, keys, data);
-           Log.d("testseb",(new Zenroom()).execute(script, conf, keys, data));
-           Log.d("result",result);
+        Log.d("testconsole", "Executing Zenroom in verbose mode and printing the keypair only to console...");
+        Log.d("testconsole", (new Zenroom()).execute(script, conf, keys, data));
+        Log.d("testconsole", "...finished printing the keypair only to console.");
         setContentView(R.layout.activity_main);
-      //  findViewById(R.id.result).setText(result);
-
-        setContentView(R.layout.activity_main);
-
 
     }
 
-    public void generateAndPrintKeygen(View view) {
-            //zencodeKeygen
+    // in this other function, Zenroom is executed in default mode (conf="debug=0"), so a minimal output is printed to
+    // console, not including the output of the script, which here is visible only in the app
 
-        Log.d("testseb", "Starting the test....");
+    public void generateAndPrintKeygen(View view) {
 
         script = "rule check version 1.0.0\n"
                 + "Scenario 'ecdh':Create the keypair\n"
@@ -59,9 +58,9 @@ public class MainActivity extends AppCompatActivity {
                 + "Then print all data";
         keys = "";
         data= "";
-    //   Use the conf below to give pass it a know random seed (must be 64 bytes) if you want to test determinism
-     conf = "debug=0, rngseed=hex:74eeeab870a394175fae808dd5dd3b047f3ee2d6a8d01e14bff94271565625e98a63babe8dd6cbea6fedf3e19de4bc80314b861599522e44409fdd20f7cd6cfc" ;
-     //   conf= "debug=0";
+
+    // Uncomment the line below, to use the "conf" in order to pass Zenroom a know random seed (must be 64 bytes) if you want to test determinism
+    // conf = "debug=0 , rngseed=hex:74eeeab870a394175fae808dd5dd3b047f3ee2d6a8d01e14bff94271565625e98a63babe8dd6cbea6fedf3e19de4bc80314b861599522e44409fdd20f7cd6cfc" ;
 
         TextView buttonResult2 = (TextView)findViewById(R.id.buttonResult2);
         buttonResult2.setText(script);
@@ -70,16 +69,13 @@ public class MainActivity extends AppCompatActivity {
 
         // change the i below if you are passing a known rngseed and want to test determinism
         for (int i=0; i<1; i++ ){
-
-            result = (new Zenroom()).execute(script, conf, keys, data);
-
+            Log.d("testapp", "Executing the script visible in the app....");
+                result = (new Zenroom()).execute(script, conf, keys, data);
+            Log.d("testapp", "...done executing the script visible in the app.");
         }
-//           Log.d ( "result: ", result = (new Zenroom()).execute(script, conf, keys, data));  }
 
         TextView buttonResult = (TextView)findViewById(R.id.buttonResult);
         buttonResult.setText(result);
-
-
 
     }
 }
