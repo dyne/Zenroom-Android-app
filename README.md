@@ -2,9 +2,11 @@
 
 Very simple app to show how to use Zenroom libs in Android. 
 
-## Requirements
- - Android Studio 4.0 or above
- - Android NDK 
+## Requirements/Versions
+ - Java 17
+ - Gradle 8.10.1
+ - compileSdk 35
+ - Zenroom >= 5.22.2
  
 ## Usage
  - Clone, build and run in the emulator 
