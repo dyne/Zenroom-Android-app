@@ -11,8 +11,8 @@ public class MainActivity extends AppCompatActivity {
 
   String script, data, keys, conf;
   // Define placeholders or actual values for the new parameters
-  String extra = null; // Or some meaningful string
-  String context = null; // Or some meaningful string, or null if appropriate
+  String extra = ""; // Or some meaningful string
+  String context = ""; // Or some meaningful string, or null if appropriate
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
       + "Then print the 'keyring'";
     keys = "";
     data = "";
-    conf = "logfmt=text, debug=3";
+    conf = "logfmt=text, debug=2";
     // You might need to define conf, extraValue, contextValue here too if they differ
     // String localConf = "debug=0";
     // String localExtra = "some_extra_for_bob";
