@@ -1,87 +1,85 @@
 package com.example.zencode;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
-import dyne.zenroom.Zencode;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.List;
 
-  String script, data, keys, conf;
-  // Define placeholders or actual values for the new parameters
-  String extra = ""; // Or some meaningful string
-  String context = ""; // Or some meaningful string, or null if appropriate
+public class MainActivity extends AppCompatActivity implements ContractAdapter.OnContractListener {
+
+  private RecyclerView recyclerView;
+  private ContractAdapter adapter;
+  private List<ZencodeContract> contractList;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-//
-//    script = "rule check version 1.0.0\n"
-//      + "Scenario 'ecdh':Create the keypair\n"
-//      + "Given that I am known as 'Alice'\n"
-//      + "When I create the ecdh key\n"
-//      + "Then print 'keyring'";
-//    keys = "";
-//    data = "";
-//    conf = "logfmt=text, debug=3";
-//
-//    Log.d("testconsole", "Executing Zenroom in verbose mode and printing the keypair only to console...");
-//
-//    Zencode zencodeInstance = new Zencode();
-//    String result = "Error calling native method";
-//    try {
-//      // PASS THE TWO NEW PARAMETERS
-//      result = zencodeInstance.zenroom(script, conf, keys, data, extra, context);
-//    } catch (UnsatisfiedLinkError ule) {
-//      Log.e("testconsole", "Failed to link Zenroom native method: " + ule.getMessage(), ule);
-//    } catch (Exception e) {
-//      Log.e("testconsole", "Exception calling Zenroom native method: " + e.getMessage(), e);
-//    }
-//
-//    Log.d("testconsole", result);
-//    Log.d("testconsole", "...finished printing the keypair only to console.");
     setContentView(R.layout.activity_main);
+
+    recyclerView = findViewById(R.id.recyclerViewContracts);
+    recyclerView.setLayoutManager(new LinearLayoutManager(this));
+    recyclerView.setHasFixedSize(true);
+
+    // Load your contracts
+    loadContracts();
+
+    // Set up the adapter
+    adapter = new ContractAdapter(contractList, this);
+    recyclerView.setAdapter(adapter);
   }
 
-  public void generateAndPrintKeygen(View view) {
-    script = "rule check version 1.0.0\n"
-      + "Scenario 'ecdh':Create the keypair\n"
-      + "Given that I am known as 'Bob'\n"
-      + "When I create the ecdh key\n"
-      + "Then print the 'keyring'";
-    keys = "";
-    data = "";
-    conf = "logfmt=text, debug=2";
-    // You might need to define conf, extraValue, contextValue here too if they differ
-    // String localConf = "debug=0";
-    // String localExtra = "some_extra_for_bob";
-    // String localContext = "bob_context";
+  private void loadContracts() {
+    contractList = new ArrayList<>();
 
+    // Example 1: Generate Keypair
+    String keypairContract = "rule check version 1.0.0\n"
+            + "Scenario 'ecdh':Create the keypair\n"
+            + "Given that I am known as 'Alice'\n"
+            + "When I create the ecdh key\n"
+            + "Then print the 'keyring'";
+    contractList.add(new ZencodeContract(
+            "Generate ECDH Keypair",
+            keypairContract,
+            "", // No keys needed
+            ""  // No data needed
+    ));
 
-    TextView buttonResult2 = (TextView) findViewById(R.id.buttonResult2);
-    buttonResult2.setText(script);
+    // Example 2: Sign a message
+//    String signContract = "rule check version 1.0.0\n"
+//            + "Scenario 'sign': sign a message\n"
+//            + "Given I have a 'keyring' and a 'message'\n"
+//            + "When I sign the 'message' with the 'keyring'\n"
+//            + "Then print the 'signature'";
+//    String signKeys = "{\n"
+//            + "  \"keyring\": {\n"
+//            + "    \"public_key\": \"...\",\n"
+//            + "    \"private_key\": \"...\"\n"
+//            + "  }\n"
+//            + "}";
+//    String signData = "{\n"
+//            + "  \"message\": \"Hello Zenroom!\"\n"
+//            + "}";
+//    contractList.add(new ZencodeContract(
+//            "Sign a Message",
+//            signContract,
+//            signKeys,
+//            signData
+//    ));
 
-    String resultFromButton = "empty string";
+    // Add more contracts here...
+  }
 
-    Zencode zencodeInstance = new Zencode();
-    try {
-      // PASS THE TWO NEW PARAMETERS
-      resultFromButton = zencodeInstance.zenroom(script, conf, keys, data, extra, context);
-      // Or use localConf, localExtra, localContext if defined for this method
-    } catch (UnsatisfiedLinkError ule) {
-      Log.e("testapp", "Failed to link Zenroom native method: " + ule.getMessage(), ule);
-      resultFromButton = "Error: " + ule.getMessage();
-    } catch (Exception e) {
-      Log.e("testapp", "Exception calling Zenroom native method: " + e.getMessage(), e);
-      resultFromButton = "Error: " + e.getMessage();
-    }
-
-    Log.d("testconsole", resultFromButton);
-    Log.d("testconsole", "...finished printing the keypair only to console.");
-
-    TextView buttonResult = (TextView) findViewById(R.id.buttonResult);
-    buttonResult.setText(resultFromButton);
+  @Override
+  public void onContractClick(int position) {
+    // Create an intent to open the detail activity
+    Intent intent = new Intent(this, ContractDetailActivity.class);
+    // Pass the selected contract object to the detail activity
+    intent.putExtra("SELECTED_CONTRACT", contractList.get(position));
+    startActivity(intent);
   }
 }
