@@ -1,18 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <!-- The Toolbar acts as the app bar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_main"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@android:color/background_light"
+        android:elevation="4dp"
+        android:paddingTop="10px"
+        android:paddingBottom="10px"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:logo="@drawable/zenroom_logotype"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />  <!-- YOUR LOGO HERE -->
+
+    <!-- The RecyclerView is positioned below the Toolbar -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewContracts"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_below="@id/toolbar_main" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

@@ -1,83 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:orientation="vertical"
+    tools:context=".ContractDetailActivity">
 
-    <LinearLayout
+    <!-- Toolbar for the detail screen -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_detail"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorAccent"
+        android:elevation="4dp"
+        android:paddingTop="10px"
+        android:paddingBottom="10px"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:logo="@drawable/zenroom_logotype"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" /> <!-- YOUR LOGO HERE -->
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Contract Script"
-            android:textStyle="bold" />
+    <!-- ScrollView contains the rest of the layout -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-        <EditText
-            android:id="@+id/editTextContract"
-            android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:gravity="top|start"
-            android:inputType="textMultiLine"
-            android:background="@android:drawable/editbox_background"
-            android:layout_marginBottom="16dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Keys (JSON)"
-            android:textStyle="bold" />
-
-        <EditText
-            android:id="@+id/editTextKeys"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:gravity="top|start"
-            android:inputType="textMultiLine"
-            android:background="@android:drawable/editbox_background"
-            android:layout_marginBottom="16dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Data (JSON)"
-            android:textStyle="bold" />
-
-        <EditText
-            android:id="@+id/editTextData"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:gravity="top|start"
-            android:inputType="textMultiLine"
-            android:background="@android:drawable/editbox_background"
-            android:layout_marginBottom="16dp"/>
-
-        <Button
-            android:id="@+id/buttonExecute"
+        <!-- Your existing LinearLayout with EditTexts and Buttons -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Execute Contract" />
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Result:"
-            android:textStyle="bold" />
+            <!-- All your TextView, EditText, Button, etc. go here -->
+            <!-- ... (The rest of the file is the same as before) ... -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Contract Script"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/textViewResult"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="#EEE"
-            android:padding="8dp"
-            android:textIsSelectable="true"
-            android:fontFamily="monospace"
-            android:textColor="#333" />
+            <EditText
+                android:id="@+id/editTextContract"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:gravity="top|start"
+                android:inputType="textMultiLine"
+                android:background="@android:drawable/editbox_background"
+                android:layout_marginBottom="16dp"/>
 
-    </LinearLayout>
-</ScrollView>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Keys (JSON)"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/editTextKeys"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:gravity="top|start"
+                android:inputType="textMultiLine"
+                android:background="@android:drawable/editbox_background"
+                android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Data (JSON)"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/editTextData"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:gravity="top|start"
+                android:inputType="textMultiLine"
+                android:background="@android:drawable/editbox_background"
+                android:layout_marginBottom="16dp"/>
+
+            <Button
+                android:id="@+id/buttonExecute"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Execute Contract" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Result:"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textViewResult"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="#EEE"
+                android:padding="8dp"
+                android:textIsSelectable="true"
+                android:fontFamily="monospace"
+                android:textColor="#333" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

@@ -1,6 +1,7 @@
 package com.example.zencode;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,6 +21,11 @@ public class MainActivity extends AppCompatActivity implements ContractAdapter.O
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+
+    Toolbar toolbar = findViewById(R.id.toolbar_main);
+    setSupportActionBar(toolbar);
+    // Optional: set a title. If you only want the logo, you can leave it blank.
+    getSupportActionBar().setTitle(" Zencode Contracts");
 
     recyclerView = findViewById(R.id.recyclerViewContracts);
     recyclerView.setLayoutManager(new LinearLayoutManager(this));
