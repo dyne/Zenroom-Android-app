@@ -11,8 +11,8 @@ public class MainActivity extends AppCompatActivity {
 
   String script, data, keys, conf;
   // Define placeholders or actual values for the new parameters
-  String extraValue = null; // Or some meaningful string
-  String contextValue = null; // Or some meaningful string, or null if appropriate
+  String extra = null; // Or some meaningful string
+  String context = null; // Or some meaningful string, or null if appropriate
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     String result = "Error calling native method";
     try {
       // PASS THE TWO NEW PARAMETERS
-      result = zencodeInstance.zenroom(script, conf, keys, data, extraValue, contextValue);
+      result = zencodeInstance.zenroom(script, conf, keys, data, extra, context);
     } catch (UnsatisfiedLinkError ule) {
       Log.e("testconsole", "Failed to link Zenroom native method: " + ule.getMessage(), ule);
     } catch (Exception e) {
@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
     Zencode zencodeInstance = new Zencode();
     try {
       // PASS THE TWO NEW PARAMETERS
-      resultFromButton = zencodeInstance.zenroom(script, conf, keys, data, extraValue, contextValue);
+      resultFromButton = zencodeInstance.zenroom(script, conf, keys, data, extra, context);
       // Or use localConf, localExtra, localContext if defined for this method
     } catch (UnsatisfiedLinkError ule) {
       Log.e("testapp", "Failed to link Zenroom native method: " + ule.getMessage(), ule);

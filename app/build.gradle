@@ -8,7 +8,7 @@ android {
     defaultConfig {
         applicationId "com.example.zencode"
         minSdkVersion 21
-        targetSdkVersion 33
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
 
@@ -27,12 +27,11 @@ android {
         }
     }
 
- /*   sourceSets {
-        main {
-            jniLibs.srcDirs 'jniLibs/armeabi-v7a/', 'jniLibs/armeabi/', 'jniLibs/x86/'
-        }
+  sourceSets {
+    main {
+      jniLibs.srcDirs = ['src/main/jniLibs']
     }
-*/
+  }
 }
 
 

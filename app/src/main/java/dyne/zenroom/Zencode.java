@@ -2,8 +2,12 @@ package dyne.zenroom;
 
 import android.util.Log;
 
+
+
 public class Zencode {
   static {
+    //System.loadLibrary("dependency_lib");
+    //System.loadLibrary("zenroom");
     try {
       // Ensure this name ("zenroom") matches your .so file name (e.g., libzenroom.so)
       System.loadLibrary("zenroom");
