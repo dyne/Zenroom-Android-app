@@ -11,6 +11,7 @@ import android.os.Bundle;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class MainActivity extends AppCompatActivity implements ContractAdapter.OnContractListener {
 
   private RecyclerView recyclerView;
@@ -128,6 +129,33 @@ public class MainActivity extends AppCompatActivity implements ContractAdapter.O
             signKeys,
             signData
     ));
+
+    String longFellowGenerateProof = "Scenario longfellow\n" +
+            "Given I have a 'circuit'\n" +
+            "and 'attributes' named 'sd'\n" +
+            "and a 'string' named 'now'\n" +
+            "and a 'hex' named 'transcript'\n" +
+            "and a 'hex' named 'public key'\n" +
+            "and a 'base64' named 'document'\n" +
+            "When I create the proof of attributes 'sd' in mdoc 'document'\n" +
+            "and I create the new dictionary named 'parameters'\n" +
+            "and I move 'transcript' as 'hex' in 'parameters'\n" +
+            "and I move 'public key' as 'hex' in 'parameters'\n" +
+            "and I move 'now' as 'string' in 'parameters'\n" +
+            "and I move 'sd' as 'string' in 'parameters'\n" +
+            "Then print 'proof'\n" +
+            "Then print 'parameters'";
+
+
+
+    contractList.add(new ZencodeContract(
+            "Longfellow-zk generate proof",
+            longFellowGenerateProof,
+            "",
+            ""
+    ));
+
+
 
     // Add more contracts here...
   }

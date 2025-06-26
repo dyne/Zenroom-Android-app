@@ -14,6 +14,8 @@ import dyne.zenroom.Zencode;
 import org.json.JSONObject;
 import org.json.JSONException;
 
+import java.util.Objects;
+
 class JsonUtils {
     public static String prettyPrintJson(String json) {
         try {
@@ -53,8 +55,22 @@ public class ContractDetailActivity extends AppCompatActivity {
         buttonExecute = findViewById(R.id.buttonExecute);
         textViewResult = findViewById(R.id.textViewResult);
 
+
         // Populate the views if the contract is not null
         if (contract != null) {
+            if (Objects.equals(contract.getTitle(), "Longfellow-zk generate proof")) {
+                Log.e("if tittle",  contract.getTitle());
+//                new Thread(() -> {
+                    final String content = StringLoader.readRawTextFile(this, R.raw.longfellow_circuit_1);
+                    Log.e("if tittle",  content);
+//                    runOnUiThread(() -> {
+
+                        editTextKeys.setText(content);
+
+//                    });
+//                }).start();
+
+            }
             setTitle(contract.getTitle()); // Set activity title
             editTextContract.setText(contract.getContract());
             editTextKeys.setText(contract.getKeys());
@@ -73,7 +89,6 @@ public class ContractDetailActivity extends AppCompatActivity {
     private void executeZencode() {
         // Get the (potentially edited) text from the fields
         String script = editTextContract.getText().toString();
-        String keys = editTextKeys.getText().toString();
         String data = editTextData.getText().toString();
 
         // Define conf, extra, context (as in your original code)
@@ -86,6 +101,9 @@ public class ContractDetailActivity extends AppCompatActivity {
 
         try {
             Zencode zencodeInstance = new Zencode();
+
+            String keys = editTextKeys.getText().toString();
+
             result = zencodeInstance.zenroom(script, conf, keys, data, extra, context);
         } catch (UnsatisfiedLinkError ule) {
             String errorMsg = "Failed to link Zenroom native method: " + ule.getMessage();
