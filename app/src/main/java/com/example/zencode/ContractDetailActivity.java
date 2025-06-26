@@ -11,6 +11,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import dyne.zenroom.Zencode;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import org.json.JSONObject;
 import org.json.JSONException;
 
@@ -34,6 +38,8 @@ public class ContractDetailActivity extends AppCompatActivity {
     private TextView textViewResult;
     private ZencodeContract contract;
 
+    private String circuit;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,13 +48,12 @@ public class ContractDetailActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar_detail);
         setSupportActionBar(toolbar);
 
-
         // Get the contract from the intent
         contract = getIntent().getParcelableExtra("SELECTED_CONTRACT");
 
         // Initialize views
         editTextContract = findViewById(R.id.editTextContract);
-        editTextKeys = findViewById(R.id.editTextKeys);
+        editTextKeys = findViewById(R.id.editTextKeys); // This is the target EditText
         editTextData = findViewById(R.id.editTextData);
         buttonExecute = findViewById(R.id.buttonExecute);
         textViewResult = findViewById(R.id.textViewResult);
@@ -56,8 +61,13 @@ public class ContractDetailActivity extends AppCompatActivity {
         // Populate the views if the contract is not null
         if (contract != null) {
             setTitle(contract.getTitle()); // Set activity title
+            if (contract.getTitle().equals("lf")) {
+                 circuit = loadStringFromRawResource(R.raw.circuit);
+                 Log.e("caopsap", circuit);
+            } else {
+                editTextKeys.setText(contract.getKeys());
+            }
             editTextContract.setText(contract.getContract());
-            editTextKeys.setText(contract.getKeys());
             editTextData.setText(contract.getData());
         }
 
@@ -70,20 +80,60 @@ public class ContractDetailActivity extends AppCompatActivity {
         });
     }
 
+    // Helper method to read a string from a raw resource file
+    private String loadStringFromRawResource(int resourceId) {
+        InputStream inputStream = null;
+        BufferedReader reader = null;
+        StringBuilder stringBuilder = new StringBuilder();
+        try {
+            inputStream = getResources().openRawResource(resourceId);
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line).append("\n");
+            }
+            if (stringBuilder.length() > 0 && stringBuilder.charAt(stringBuilder.length() - 1) == '\n') {
+                stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+            }
+            return stringBuilder.toString();
+        } catch (IOException e) {
+            Log.e("LoadRawFile", "Error reading raw resource file: " + getResources().getResourceEntryName(resourceId), e);
+            return null;
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    Log.e("LoadRawFile", "Error closing input stream", e);
+                }
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    Log.e("LoadRawFile", "Error closing buffered reader", e);
+                }
+            }
+        }
+    }
+
+
     private void executeZencode() {
-        // Get the (potentially edited) text from the fields
         String script = editTextContract.getText().toString();
         String keys = editTextKeys.getText().toString();
         String data = editTextData.getText().toString();
 
-        // Define conf, extra, context (as in your original code)
         String conf = "logfmt=text, debug=1";
         String extra = "";
         String context = "";
 
+        if (contract.getTitle().equals("lf")) {
+            keys = circuit;
+            Log.e("<<<<<<<<<<<<<<", keys);
+        }
+
         Log.d("ZencodeExecute", "Executing contract...");
         String result;
-
         try {
             Zencode zencodeInstance = new Zencode();
             result = zencodeInstance.zenroom(script, conf, keys, data, extra, context);

@@ -19,8 +19,7 @@
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
-    <activity android:name=".ContractDetailActivity"
-        android:label="Contract Details">
+    <activity android:name=".ContractDetailActivity" android:label="Contract Details">
     </activity>
 
   </application>
