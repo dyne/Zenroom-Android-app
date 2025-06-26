@@ -24,12 +24,13 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_weight="1"
         android:fillViewport="true">
 
         <!-- Your existing LinearLayout with EditTexts and Buttons -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical"
             android:padding="16dp">
 
@@ -80,11 +81,21 @@
                 android:gravity="top|start"
                 android:inputType="textMultiLine" />
 
+
+
             <Button
                 android:id="@+id/buttonExecute"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Execute Contract" />
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -93,16 +104,10 @@
                 android:text="Result:"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/textViewResult"
+            <WebView
+                android:id="@+id/webViewResult"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:background="#EEE"
-                android:padding="8dp"
-                android:textIsSelectable="true"
-                android:fontFamily="monospace"
-                android:textColor="#333" />
+                android:layout_height="300dp" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>
