@@ -15,6 +15,21 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import org.json.JSONObject;
+import org.json.JSONException;
+
+class JsonUtils {
+    public static String prettyPrintJson(String json) {
+        try {
+            JSONObject jsonObject = new JSONObject(json);
+            return jsonObject.toString(2);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return json;
+        }
+    }
+}
+
 
 public class ContractDetailActivity extends AppCompatActivity {
 
@@ -133,6 +148,6 @@ public class ContractDetailActivity extends AppCompatActivity {
         }
 
         Log.d("ZencodeExecute", "Result: " + result);
-        textViewResult.setText(result);
+        textViewResult.setText(JsonUtils.prettyPrintJson(result));
     }
 }
