@@ -11,6 +11,22 @@ import android.widget.EditText;
 import android.widget.TextView;
 import dyne.zenroom.Zencode;
 
+import org.json.JSONObject;
+import org.json.JSONException;
+
+class JsonUtils {
+    public static String prettyPrintJson(String json) {
+        try {
+            JSONObject jsonObject = new JSONObject(json);
+            return jsonObject.toString(2);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return json;
+        }
+    }
+}
+
+
 public class ContractDetailActivity extends AppCompatActivity {
 
     private EditText editTextContract, editTextKeys, editTextData;
@@ -82,6 +98,6 @@ public class ContractDetailActivity extends AppCompatActivity {
         }
 
         Log.d("ZencodeExecute", "Result: " + result);
-        textViewResult.setText(result);
+        textViewResult.setText(JsonUtils.prettyPrintJson(result));
     }
 }
