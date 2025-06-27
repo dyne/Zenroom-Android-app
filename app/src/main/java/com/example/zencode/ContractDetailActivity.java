@@ -1,214 +1,311 @@
 package com.example.zencode;
 
+import android.animation.ValueAnimator;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.webkit.WebView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import android.os.Bundle;
-import android.os.Looper;  // For posting to main thread
-import android.os.Handler;  // For posting to main thread
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import com.google.android.material.snackbar.Snackbar;
 
-import dyne.zenroom.Zencode;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.json.JSONObject;
-import org.json.JSONException;
-import android.webkit.WebView;
+import dyne.zenroom.Zencode;
 
 public class ContractDetailActivity extends AppCompatActivity {
-    public static final String LONGFELLOW_CONTRACT_TITLE = "lf";
+    private static final String TAG = "ContractDetail";
     private EditText editTextContract, editTextKeys, editTextData;
-    private TextView textViewResult;
-    private Button buttonExecute;
-    private ZencodeContract contract;
+    private Button buttonExecute, verify;
     private ProgressBar progressBar;
     private WebView webViewResult;
 
+    private ZencodeContract contract;
     private String circuit;
 
-    // ExecutorService for background tasks
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-    // Handler to post results back to the main thread
     private final Handler mainThreadHandler = new Handler(Looper.getMainLooper());
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contract_detail);
+        setupToolbar();
+        initializeViews();
+        populateContractData();
+        setupListeners();
+    }
 
+    private void setupToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar_detail);
         setSupportActionBar(toolbar);
+    }
 
-        // Get the contract from the intent
-        contract = getIntent().getParcelableExtra("SELECTED_CONTRACT");
-
-        // Initialize views
+    private void initializeViews() {
         editTextContract = findViewById(R.id.editTextContract);
-        editTextKeys = findViewById(R.id.editTextKeys); // This is the target EditText
+        editTextKeys = findViewById(R.id.editTextKeys);
         editTextData = findViewById(R.id.editTextData);
         buttonExecute = findViewById(R.id.buttonExecute);
         webViewResult = findViewById(R.id.webViewResult);
         progressBar = findViewById(R.id.progressBar);
-
-        // Populate the views if the contract is not null
-        if (contract != null) {
-            setTitle(contract.getTitle()); // Set activity title
-            if (contract.getTitle().equals("lf")) {
-                circuit = loadStringFromRawResource(R.raw.circuit);
-            } else {
-                editTextKeys.setText(contract.getKeys());
-            }
-            editTextContract.setText(contract.getContract());
-            editTextData.setText(contract.getData());
-        }
-
-        // Set listener for the execute button
-        buttonExecute.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                executeZencode();
-            }
-        });
+        verify = findViewById(R.id.verify);
     }
 
-    // Helper method to read a string from a raw resource file
-    private String loadStringFromRawResource(int resourceId) {
-        InputStream inputStream = null;
-        BufferedReader reader = null;
-        StringBuilder stringBuilder = new StringBuilder();
-        try {
-            inputStream = getResources().openRawResource(resourceId);
-            reader = new BufferedReader(new InputStreamReader(inputStream));
+    private void populateContractData() {
+        contract = getIntent().getParcelableExtra("SELECTED_CONTRACT");
+        if (contract == null) return;
+
+        setTitle(contract.getTitle());
+        if (getString(R.string.lf).equals(contract.getTitle())) {
+            circuit = loadRawResourceAsString(R.raw.circuit);
+        } else {
+            editTextKeys.setText(contract.getKeys());
+        }
+        editTextContract.setText(contract.getContract());
+        editTextData.setText(contract.getData());
+    }
+
+    private void setupListeners() {
+        buttonExecute.setOnClickListener(v -> executeZencode());
+    }
+
+    private String loadRawResourceAsString(int resourceId) {
+        try (InputStream inputStream = getResources().openRawResource(resourceId);
+             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+
+            StringBuilder result = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
-                stringBuilder.append(line).append("\n");
+                result.append(line).append("\n");
             }
-            if (stringBuilder.length() > 0 && stringBuilder.charAt(stringBuilder.length() - 1) == '\n') {
-                stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-            }
-            return stringBuilder.toString();
+            return result.toString().trim();
+
         } catch (IOException e) {
-            Log.e("LoadRawFile", "Error reading raw resource file: " + getResources().getResourceEntryName(resourceId), e);
+            Log.e(TAG, "Failed to read raw resource", e);
             return null;
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    Log.e("LoadRawFile", "Error closing input stream", e);
-                }
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    Log.e("LoadRawFile", "Error closing buffered reader", e);
-                }
-            }
+        }
+    }
+
+    private void executeZencode() {
+        showLoadingState(true);
+
+        final String script = editTextContract.getText().toString();
+        final String keys = editTextKeys.getText().toString();
+        final String data = editTextData.getText().toString();
+        final String actualKeys = getString(R.string.lf).equals(contract.getTitle()) ? circuit : keys;
+
+        executorService.execute(() -> {
+            String result = runZencode(script, actualKeys, data);
+            mainThreadHandler.post(() -> handleExecutionResult(result));
+        });
+    }
+
+    private String runZencode(String script, String keys, String data) {
+        try {
+            Zencode zencode = new Zencode();
+            return zencode.zenroom(script, "logfmt=text, debug=3", keys, data, "", "");
+        } catch (UnsatisfiedLinkError | Exception e) {
+            Log.e(TAG, "Zenroom execution failed", e);
+            return "ERROR: " + e.getMessage();
+        }
+    }
+
+    private void handleExecutionResult(String result) {
+        setupResultActions(result);
+        animateWeightChange();
+        showLoadingState(false);
+        updateWebViewWithResult(result);
+        Log.d(TAG, "Execution completed and UI updated.");
+    }
+
+    private void showLoadingState(boolean isLoading) {
+        progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+        buttonExecute.setEnabled(!isLoading);
+    }
+
+    private void setupResultActions(String result) {
+        findViewById(R.id.saveLayout).setVisibility(View.VISIBLE);
+
+        Button buttonSave = findViewById(R.id.buttonSave);
+        Button verifyButton = findViewById(R.id.verifyButton);
+
+        buttonSave.setOnClickListener(v -> saveToFile(result));
+        verifyButton.setOnClickListener(v -> {
+            executorService.execute(() -> {
+                String response = postProofToServer(result);
+
+                mainThreadHandler.post(() -> {
+                    injectResultIntoWebView(response, "https://zkp.api.forkbomb.eu/longfellow-zk-verify-proof");
+                });
+            });
+        });
+
+
+        if (getString(R.string.lf).equals(contract.getTitle())) {
+            verifyButton.setVisibility(View.VISIBLE);
         }
     }
 
 
-    private void executeZencode() {
-        progressBar.setVisibility(View.VISIBLE);
-        buttonExecute.setEnabled(false);
-        String script = editTextContract.getText().toString();
-        String keys = editTextKeys.getText().toString();
-        String data = editTextData.getText().toString();
 
-        String conf = "logfmt=text, debug=3";
-        String extra = "";
-        String context = "";
-
-
-        executorService.execute(() -> {
-            final String actualKeys;
-            if (contract.getTitle().equals(LONGFELLOW_CONTRACT_TITLE)) {
-                actualKeys = circuit;
-            } else {
-                actualKeys = keys;
-            }
-            Log.d("ZencodeExecute", "Executing contract...");
-            String result;
-            try {
-                Zencode zencodeInstance = new Zencode();
-                Log.d("ZencodeExecute", "🚀 Preparing to execute Zenroom with parameters:");
-                Log.d("ZencodeExecute", "📜 Script: " + script);
-                Log.d("ZencodeExecute", "⚙️ Conf: " + conf);
-                Log.d("ZencodeExecute", "🔑 Keys: " + actualKeys);
-                Log.d("ZencodeExecute", "💾 Data: " + data);
-                Log.d("ZencodeExecute", "➕ Extra: " + extra);
-                Log.d("ZencodeExecute", "🌍 Context: " + context);
-
-                result = zencodeInstance.zenroom(script, conf, actualKeys, data, extra, context);
-            } catch (UnsatisfiedLinkError ule) {
-                String errorMsg = "Failed to link Zenroom native method: " + ule.getMessage();
-                Log.e("ZencodeExecute", errorMsg, ule);
-                result = "ERROR: " + errorMsg;
-            } catch (Exception e) {
-                String errorMsg = "Exception calling Zenroom native method: " + e.getMessage();
-                Log.e("ZencodeExecute", errorMsg, e);
-                result = "ERROR: " + errorMsg;
-            }
-
-
-            String finalResult = result;
-            mainThreadHandler.post(() -> {
-                progressBar.setVisibility(View.GONE);
-                buttonExecute.setEnabled(true);
-
-                // Wrap in basic HTML, using <pre> for preformatted text
-                // The CSS ensures long lines wrap correctly
-                String htmlContent = "<html><head><style>pre { white-space: pre-wrap; word-wrap: break-word; }</style></head><body><pre>"
-                        + finalResult
-                        + "</pre></body></html>";
-
-                // Load the HTML content into the WebView
-                webViewResult.loadDataWithBaseURL(
-                        null,        // baseUrl (null for local content)
-                        htmlContent, // data (your HTML string)
-                        "text/html", // mimeType
-                        "UTF-8",     // encoding
-                        null         // historyUrl (null)
-                );
-                Log.d("ZencodeExecute", "UI updated with result.");
-            });
-        });
+    private void updateWebViewWithResult(String result) {
+        String html =
+            "<!DOCTYPE html>\n" +
+            "<html>\n" +
+            "<head>\n" +
+            "  <meta charset='UTF-8'>\n" +
+            "  <title>Zenroom Result</title>\n" +
+            "  <style>\n" +
+            "    pre { white-space: pre-wrap; word-wrap: break-word; background: #f0f0f0 }\n" +
+            "  </style>\n" +
+            "</head>\n" +
+            "<body>\n" +
+            "  <div id='content'>\n" +
+            "    <pre id='result'>" + result + "</pre>\n" +
+            "  </div>\n" +
+            "</body>\n" +
+            "</html>";
+        webViewResult.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
     }
+
+    private void animateWeightChange() {
+        ScrollView inputScroll = findViewById(R.id.inputScroll);
+        WebView webView = findViewById(R.id.webViewResult);
+
+        LinearLayout parentLayout = (LinearLayout) inputScroll.getParent();
+        int totalHeight = parentLayout.getHeight();
+        int inputTargetHeight = (int) (totalHeight * 0.0);
+        int webTargetHeight = (int) (totalHeight * 0.83);
+
+        animateHeight(inputScroll, inputScroll.getHeight(), inputTargetHeight);
+        animateHeight(webView, webView.getHeight(), webTargetHeight);
+    }
+
+    private void animateHeight(View view, int from, int to) {
+        ValueAnimator animator = ValueAnimator.ofInt(from, to);
+        animator.addUpdateListener(valueAnimator -> {
+            ViewGroup.LayoutParams params = view.getLayoutParams();
+            params.height = (int) valueAnimator.getAnimatedValue();
+            view.setLayoutParams(params);
+        });
+        animator.setDuration(300);
+        animator.start();
+    }
+
+    private void saveToFile(String content) {
+        File file = new File(getExternalFilesDir(null), "zenroom_result.txt");
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            fos.write(content.getBytes());
+            showSnackbar("Saved to: " + file.getAbsolutePath());
+        } catch (IOException e) {
+            Log.e(TAG, "Failed to save file", e);
+            Toast.makeText(this, "Failed to save file", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void showSnackbar(String message) {
+        View rootView = findViewById(android.R.id.content);
+        Snackbar.make(rootView, message, Snackbar.LENGTH_LONG).show();
+    }
+
+    private String postProofToServer(String proofJsonString) {
+        try {
+            URL url = new URL("https://zkp.api.forkbomb.eu/longfellow-zk-verify-proof");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json"); // ← critical: no charset!
+            conn.setDoOutput(true);
+            conn.setConnectTimeout(10000);
+            conn.setReadTimeout(10000);
+
+            byte[] bytes = proofJsonString.getBytes();
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(bytes);
+            }
+
+            int code = conn.getResponseCode();
+            Log.d("ZK_POST", "Response code: " + code + " / " + conn.getResponseMessage());
+
+            InputStream is = (code >= 200 && code < 300) ? conn.getInputStream() : conn.getErrorStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) sb.append(line).append("\n");
+
+            return sb.toString().trim();
+
+        } catch (Exception e) {
+            Log.e("ZK_POST", "Exception: " + e.getMessage(), e);
+            return "ERROR: " + e.getMessage();
+        }
+    }
+
+    private void injectResultIntoWebView(String response, String url) {
+        String escaped = response
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#39;");
+
+        String html = "<html><head><meta charset='utf-8'><style>" +
+                "body { font-family: sans-serif; padding: 1em; }" +
+                "pre { background: #f0f0f0; padding: 1em; border-radius: 5px; white-space: pre-wrap; word-wrap: break-word; }" +
+                ".url { font-size: 12px; color: #888; margin-bottom: 1em; }" +
+                "</style></head><body>" +
+                "<div class='url'>Verified via: <code>" + url + "</code></div>" +
+                "<pre>" + escaped + "</pre>" +
+                "</body></html>";
+
+        webViewResult.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
+    }
+
+
+
+
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // It's good practice to shut down the executor when the Activity is destroyed,
-        // though running tasks will complete unless you call shutdownNow().
-        if (executorService != null && !executorService.isShutdown()) {
-            // executorService.shutdown(); // Allows existing tasks to complete
-            executorService.shutdownNow(); // Attempts to stop all actively executing tasks
-            Log.d("ContractDetailActivity", "ExecutorService shut down.");
+        if (!executorService.isShutdown()) {
+            executorService.shutdownNow();
+            Log.d(TAG, "ExecutorService shut down.");
         }
     }
-}
 
-class JsonUtils {
-    public static String prettyPrintJson(String json) {
-        try {
-            JSONObject jsonObject = new JSONObject(json);
-            return jsonObject.toString(2);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return json;
+    public static class JsonUtils {
+        public static String prettyPrintJson(String json) {
+            try {
+                JSONObject obj = new JSONObject(json);
+                return obj.toString(2);
+            } catch (JSONException e) {
+                return json;
+            }
         }
     }
 }

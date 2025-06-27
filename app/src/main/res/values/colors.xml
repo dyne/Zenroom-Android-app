@@ -1,6 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
+    <color name="purple_500">#6200EE</color>
+    <color name="purple_700">#3700B3</color>
+    <color name="teal_200">#03DAC5</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+    <color name="colorPrimary">#E1BEE7</color> <!-- Almost white gray -->
+    <color name="colorPrimaryVariant">#E0E0E0</color> <!-- Light border/shadow -->
+    <color name="colorOnPrimary">#212121</color> <!-- Dark text on light bg -->
+
+    <color name="colorSecondary">#B2EBF2</color> <!-- Soft cyan accent -->
+    <color name="colorSecondaryVariant">#80DEEA</color>
+    <color name="colorOnSecondary">#004D40</color>
+
+    <color name="colorBackground">#FFFFFF</color>
+    <color name="colorSurface">#FAFAFA</color>
+    <color name="colorOnBackground">#212121</color>
+    <color name="colorOnSurface">#333333</color>
+
+    <!-- Optional: UI Chrome / subtle neutrals -->
+    <color name="colorDivider">#DDDDDD</color>
+    <color name="colorDisabled">#BDBDBD</color>
 </resources>

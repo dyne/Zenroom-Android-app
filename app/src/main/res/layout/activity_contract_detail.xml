@@ -1,113 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".ContractDetailActivity">
+    android:weightSum="1"
+    android:background="?android:colorBackground">
 
-    <!-- Toolbar for the detail screen -->
-    <androidx.appcompat.widget.Toolbar
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar_detail"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorAccent"
-        android:elevation="4dp"
-        android:paddingTop="10px"
-        android:paddingBottom="10px"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:titleTextColor="@android:color/white"
         app:logo="@drawable/zenroom_logotype"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" /> <!-- YOUR LOGO HERE -->
+        app:title="Zencode Detail"
+        app:popupTheme="@style/ThemeOverlay.Material3.Light"
+        android:background="?attr/colorPrimary" />
 
-    <!-- ScrollView contains the rest of the layout -->
     <ScrollView
+        android:id="@+id/inputScroll"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:layout_weight="1"
         android:fillViewport="true">
 
-        <!-- Your existing LinearLayout with EditTexts and Buttons -->
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:id="@+id/inputContainer"
             android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:padding="16dp">
 
-            <!-- All your TextView, EditText, Button, etc. go here -->
-            <!-- ... (The rest of the file is the same as before) ... -->
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Contract Script"
                 android:textStyle="bold" />
 
-            <EditText
-                android:id="@+id/editTextContract"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="301dp"
-                android:layout_marginBottom="16dp"
-                android:background="@android:drawable/editbox_background"
-                android:gravity="top|start"
-                android:inputType="textMultiLine" />
-
-            <TextView
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Keys (JSON)"
-                android:textStyle="bold" />
+                android:layout_marginBottom="12dp">
 
-            <EditText
-                android:id="@+id/editTextKeys"
-                android:layout_width="match_parent"
-                android:layout_height="249dp"
-                android:layout_marginBottom="16dp"
-                android:background="@android:drawable/editbox_background"
-                android:gravity="top|start"
-                android:inputType="textMultiLine" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextContract"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top"
+                    android:inputType="textMultiLine"
+                    android:minLines="4"
+                    android:textSize="11sp" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Data (JSON)"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/editTextData"
-                android:layout_width="match_parent"
-                android:layout_height="341dp"
-                android:layout_marginBottom="16dp"
-                android:background="@android:drawable/editbox_background"
-                android:gravity="top|start"
-                android:inputType="textMultiLine" />
-
-
-
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonExecute"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Execute Contract" />
 
-            <ProgressBar
-                android:id="@+id/progressBar"
-                style="?android:attr/progressBarStyle"
+            <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:visibility="gone" />
+                android:text="Keys (JSON)"
+                android:textStyle="bold"
+                android:layout_marginTop="16dp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Result:"
-                android:textStyle="bold" />
-
-            <WebView
-                android:id="@+id/webViewResult"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="300dp" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextKeys"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top"
+                    android:inputType="textMultiLine"
+                    android:minLines="4"
+                    android:textSize="11sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Data (JSON)"
+                android:textStyle="bold"
+                android:layout_marginTop="16dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextData"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top"
+                    android:inputType="textMultiLine"
+                    android:minLines="4"
+                    android:textSize="11sp" />
+            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
     </ScrollView>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:layout_marginTop="8dp" />
+
+    <LinearLayout
+        android:id="@+id/saveLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonSave"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Save Result" />
+
+        <View
+            android:layout_width="8dp"
+            android:layout_height="0dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/verifyButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_weight="1"
+            android:text="Verify Online" />
+    </LinearLayout>
+
+    <WebView
+        android:layout_margin="10dp"
+        android:id="@+id/webViewResult"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0"
+        android:overScrollMode="ifContentScrolls" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/verify"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Verify proof"
+        android:visibility="gone"
+        android:layout_margin="12dp" />
 </LinearLayout>

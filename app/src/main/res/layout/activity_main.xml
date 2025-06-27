@@ -1,29 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <!-- The Toolbar acts as the app bar -->
-    <androidx.appcompat.widget.Toolbar
+    <!-- Material Toolbar (AppBar) -->
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar_main"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
-        android:background="@android:color/background_light"
-        android:elevation="4dp"
-        android:paddingTop="10px"
-        android:paddingBottom="10px"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:background="?attr/colorPrimary"
+        app:contentInsetStart="16dp"
+        app:contentInsetStartWithNavigation="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:logo="@drawable/zenroom_logotype"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />  <!-- YOUR LOGO HERE -->
+        app:logoDescription="Zenroom"
+        app:popupTheme="@style/ThemeOverlay.Material3.Light"
+        app:title="Zen Contracts"
+        app:titleTextColor="@android:color/white" />
 
-    <!-- The RecyclerView is positioned below the Toolbar -->
+
+    <!-- RecyclerView below the Toolbar -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewContracts"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/toolbar_main" />
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:padding="8dp"
+        android:scrollbars="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_main" />
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
