@@ -1,10 +1,15 @@
 package com.example.zencode;
 
 import android.animation.ValueAnimator;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +46,7 @@ import dyne.zenroom.Zencode;
 public class ContractDetailActivity extends AppCompatActivity {
     private static final String TAG = "ContractDetail";
     private EditText editTextContract, editTextKeys, editTextData;
-    private Button buttonExecute, verify;
+    private Button buttonExecute;
     private ProgressBar progressBar;
     private WebView webViewResult;
 
@@ -73,7 +78,6 @@ public class ContractDetailActivity extends AppCompatActivity {
         buttonExecute = findViewById(R.id.buttonExecute);
         webViewResult = findViewById(R.id.webViewResult);
         progressBar = findViewById(R.id.progressBar);
-        verify = findViewById(R.id.verify);
     }
 
     private void populateContractData() {
@@ -218,13 +222,28 @@ public class ContractDetailActivity extends AppCompatActivity {
     }
 
     private void saveToFile(String content) {
-        File file = new File(getExternalFilesDir(null), "zenroom_result.txt");
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            fos.write(content.getBytes());
-            showSnackbar("Saved to: " + file.getAbsolutePath());
+        String filename = "zenroom_result.txt";
+
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Downloads.DISPLAY_NAME, filename);
+        values.put(MediaStore.Downloads.MIME_TYPE, "text/plain");
+        values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+
+        Uri uri = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+        }
+        if (uri == null) {
+            Toast.makeText(this, "Failed to access Downloads", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try (OutputStream out = getContentResolver().openOutputStream(uri)) {
+            out.write(content.getBytes());
+            showSnackbar("Saved to Downloads: " + filename);
         } catch (IOException e) {
-            Log.e(TAG, "Failed to save file", e);
-            Toast.makeText(this, "Failed to save file", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Error writing to Downloads", e);
+            Toast.makeText(this, "Failed to save", Toast.LENGTH_SHORT).show();
         }
     }
 

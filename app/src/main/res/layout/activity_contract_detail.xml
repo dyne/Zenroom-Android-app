@@ -57,7 +57,7 @@
                 android:id="@+id/buttonExecute"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Execute Contract" />
+                android:text="Execute Zencode" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
