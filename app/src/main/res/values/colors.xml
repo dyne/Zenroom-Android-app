@@ -8,11 +8,11 @@
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
 
-    <color name="colorPrimary">#E1BEE7</color> <!-- Almost white gray -->
-    <color name="colorPrimaryVariant">#E0E0E0</color> <!-- Light border/shadow -->
-    <color name="colorOnPrimary">#212121</color> <!-- Dark text on light bg -->
+    <color name="colorPrimary">#E1BEE7</color>
+    <color name="colorPrimaryVariant">#E0E0E0</color>
+    <color name="colorOnPrimary">#212121</color>
 
-    <color name="colorSecondary">#B2EBF2</color> <!-- Soft cyan accent -->
+    <color name="colorSecondary">#B2EBF2</color>
     <color name="colorSecondaryVariant">#80DEEA</color>
     <color name="colorOnSecondary">#004D40</color>
 
