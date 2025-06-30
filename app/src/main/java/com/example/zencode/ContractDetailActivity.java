@@ -30,12 +30,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.ExecutorService;
@@ -87,6 +89,7 @@ public class ContractDetailActivity extends AppCompatActivity {
         setTitle(contract.getTitle());
         if (getString(R.string.lf).equals(contract.getTitle())) {
             circuit = loadRawResourceAsString(R.raw.circuit);
+            editTextKeys.setText("Hardcoded circuit is not shown (too big)");
         } else {
             editTextKeys.setText(contract.getKeys());
         }
@@ -117,17 +120,62 @@ public class ContractDetailActivity extends AppCompatActivity {
 
     private void executeZencode() {
         showLoadingState(true);
-
-        final String script = editTextContract.getText().toString();
-        final String keys = editTextKeys.getText().toString();
-        final String data = editTextData.getText().toString();
-        final String actualKeys = getString(R.string.lf).equals(contract.getTitle()) ? circuit : keys;
-
         executorService.execute(() -> {
+            final String script = editTextContract.getText().toString();
+            final String keys = editTextKeys.getText().toString();
+            final String data = editTextData.getText().toString();
+            final String actualKeys = getString(R.string.lf).equals(contract.getTitle()) ? circuit : keys;
+
+            // Optional: clear logcat before execution
+            try {
+                Runtime.getRuntime().exec("logcat -c");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            // Run Zenroom
             String result = runZencode(script, actualKeys, data);
-            mainThreadHandler.post(() -> handleExecutionResult(result));
+            if (result.isEmpty()) {
+
+                // Read the entire logcat output
+                String capturedError = "";
+                try {
+                    Process logcat = Runtime.getRuntime().exec("logcat -d");
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(logcat.getInputStream()));
+                    StringBuilder logBuilder = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        logBuilder.append(line).append("\n");
+                        if (line.contains("<<<<<<<<<<<<<<<")) break; // stop at delimiter if desired
+                    }
+                    reader.close();
+
+                    // Extract only Zenroom/stderr entries
+                    String[] lines = logBuilder.toString().split("\n");
+                    StringBuilder stderrBuilder = new StringBuilder();
+                    for (String l : lines) {
+                        if (l.contains("Zenroom/stderr")) {
+                            String clean = l.replaceFirst(".*Zenroom/stderr:\\s*", "");
+                            stderrBuilder.append(clean).append("\n");
+                        }
+                    }
+                    capturedError = stderrBuilder.toString().trim();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                if (!capturedError.isEmpty()) {
+                    result += "\n\nAn error occurred during execution:\n\n[stderr]\n" + capturedError;
+                }
+            }
+
+            final String message = result;
+            Log.e("<<<<<<<<<<<<<<<", message);
+            mainThreadHandler.post(() -> handleExecutionResult(message));
         });
     }
+
+
 
     private String runZencode(String script, String keys, String data) {
         try {
@@ -176,24 +224,23 @@ public class ContractDetailActivity extends AppCompatActivity {
     }
 
 
-
     private void updateWebViewWithResult(String result) {
         String html =
-            "<!DOCTYPE html>\n" +
-            "<html>\n" +
-            "<head>\n" +
-            "  <meta charset='UTF-8'>\n" +
-            "  <title>Zenroom Result</title>\n" +
-            "  <style>\n" +
-            "    pre { white-space: pre-wrap; word-wrap: break-word; background: #f0f0f0 }\n" +
-            "  </style>\n" +
-            "</head>\n" +
-            "<body>\n" +
-            "  <div id='content'>\n" +
-            "    <pre id='result'>" + result + "</pre>\n" +
-            "  </div>\n" +
-            "</body>\n" +
-            "</html>";
+                "<!DOCTYPE html>\n" +
+                        "<html>\n" +
+                        "<head>\n" +
+                        "  <meta charset='UTF-8'>\n" +
+                        "  <title>Zenroom Result</title>\n" +
+                        "  <style>\n" +
+                        "    pre { white-space: pre-wrap; word-wrap: break-word; background: #f0f0f0 }\n" +
+                        "  </style>\n" +
+                        "</head>\n" +
+                        "<body>\n" +
+                        "  <div id='content'>\n" +
+                        "    <pre id='result'>" + result + "</pre>\n" +
+                        "  </div>\n" +
+                        "</body>\n" +
+                        "</html>";
         webViewResult.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
     }
 
@@ -303,9 +350,6 @@ public class ContractDetailActivity extends AppCompatActivity {
 
         webViewResult.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
     }
-
-
-
 
 
     @Override
